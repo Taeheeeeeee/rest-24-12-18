@@ -3,9 +3,12 @@ package com.ll.rest.domain.post.post.controller;
 import com.ll.rest.domain.post.post.entity.Post;
 import com.ll.rest.domain.post.post.service.PostService;
 import com.ll.rest.global.redata.RsData;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,22 +42,30 @@ public class ApiV1PostController {
         return new RsData("200-1", "%d번 글을 삭제되었습니다.".formatted(id));
     }
 
-    @AllArgsConstructor
-    @Getter
-    public static class PostModifyReqBody {
-        private String title;
-        private String content;
-    }
+    record PostModifyReqBody(
+            @NotBlank
+            @Length(min = 2)
+            String title,
+            @NotBlank
+            @Length(min = 2)
+            String content
+    ) { }
 
     @PutMapping("/{id}")
     @Transactional
     public RsData modifyItem(
             @PathVariable long id
-            , @RequestBody PostModifyReqBody req
+            , @RequestBody @Valid PostModifyReqBody req
     ) {
         Post post = postService.findById(id).get();
-        postService.modify(post, req.getTitle(), req.getContent());
+        postService.modify(post, req.title, req.content);
 
         return new RsData("200-1", "%d번 글을 수정되었습니다.".formatted(id));
+    }
+
+    @PostMapping
+    public RsData writeItem(@RequestBody @Valid PostModifyReqBody req) {
+        Post post = postService.write(req.title, req.content);
+        return new RsData("200-1", "%d번 글을 작성되었습니다.".formatted(post.getId()));
     }
 }
