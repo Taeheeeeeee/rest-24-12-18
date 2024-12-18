@@ -5,6 +5,10 @@ import com.ll.rest.domain.post.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.Future;
+
 @Service
 @RequiredArgsConstructor
 public class PostService {
@@ -19,6 +23,24 @@ public class PostService {
                 .title(title)
                 .content(content)
                 .build();
+
         return postRepository.save(post);
+    }
+
+    public List<Post> findAllByOrderByIdDesc() {
+        return postRepository.findAllByOrderByIdDesc();
+    }
+
+    public Optional<Post> findById(long id) {
+        return postRepository.findById(id);
+    }
+
+    public void delete(Post post) {
+        postRepository.delete(post);
+    }
+
+    public void modify(Post post, String title, String content) {
+        post.setTitle(title);
+        post.setContent(content);
     }
 }
