@@ -1,20 +1,17 @@
 package com.ll.rest.domain.post.post.controller;
 
+import com.ll.rest.domain.post.post.dto.PostDto;
 import com.ll.rest.domain.post.post.entity.Post;
 import com.ll.rest.domain.post.post.service.PostService;
 import com.ll.rest.global.redata.RsData;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/posts")
@@ -23,15 +20,21 @@ public class ApiV1PostController {
     private final PostService postService;
 
     @GetMapping
-    public List<Post> getItems() {
-        return postService.findAllByOrderByIdDesc();
+    public List<PostDto> getItems() {
+        return postService
+                .findAllByOrderByIdDesc()
+                .stream()
+                .map(PostDto::new)
+                .toList();
     }
 
     @GetMapping("/{id}")
-    public Post getItem(
+    public PostDto getItem(
             @PathVariable long id
     ) {
-        return postService.findById(id).get();
+        return postService.findById(id)
+                .map(PostDto::new)
+                .orElseThrow();
     }
 
     @DeleteMapping("/{id}")
